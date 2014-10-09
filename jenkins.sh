@@ -4,9 +4,6 @@
 git submodule sync
 git submodule update --init --recursive
 
-vagrant box remove ubuntu/trusty64 virtualbox
-vagrant box remove trusty64 virtualbox
-
 VBGUEST=$(vagrant plugin list |grep -i vbguest)
 if [ ! "$VBGUEST" ]; then
   vagrant plugin install vagrant-vbguest
