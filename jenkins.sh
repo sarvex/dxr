@@ -4,7 +4,7 @@
 git submodule sync
 git submodule update --init --recursive
 
-vagrant box remove trusty64
+vagrant box remove ubuntu/trusty64
 
 VBGUEST=$(vagrant plugin list |grep -i vbguest)
 if [ ! "$VBGUEST" ]; then
