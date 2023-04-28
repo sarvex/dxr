@@ -17,7 +17,7 @@ ordereddict==1.1
 parsimonious==0.5
 
 # sha256: eZ7Uyvd1FuVEQIBtjZzYKnYH399OT7ZDgVFxpLXJIcA
-Pygments==1.6
+Pygments==2.7.4
 
 # sha256: EIw9QftwHEr07wDo677cFHYyyCJHvreYyNhlehKBAgY
 Werkzeug==0.8.3
