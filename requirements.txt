@@ -20,7 +20,7 @@ parsimonious==0.5
 Pygments==2.7.4
 
 # sha256: EIw9QftwHEr07wDo677cFHYyyCJHvreYyNhlehKBAgY
-Werkzeug==0.8.3
+Werkzeug==2.2.3
 
 
 # For deployment script only:
