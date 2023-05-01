@@ -5,7 +5,7 @@ Flask==0.9
 futures==2.1.4
 
 # sha256: MQo1-8ysOvE-v5Jyl_hxrGVrnaHSSLH-Z2Wv-nG1MjU
-Jinja2==2.7.2
+Jinja2==2.11.3
 
 # sha256: t9XWiL3TRb-ol3d9KXdWaIzwLhs3QsVoheLlwrmW_4I
 MarkupSafe==0.18
