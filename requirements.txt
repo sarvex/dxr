@@ -1,5 +1,5 @@
 # sha256: L9XU_-gfdi3So-WEctaQoNu6N2Z3ZQYAOu4-16qor-8
-Flask==0.9
+Flask==1.0
 
 # sha256: jE8mkbKU170cPWDs26wtQ2uxvmGITzIcBGhCUuDV7C0
 futures==2.1.4
