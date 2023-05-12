@@ -16,12 +16,13 @@ from dxr.build import (line_boundaries, remove_overlapping_refs, Region, LINE,
 def test_line_boundaries():
     """Make sure we find the correct line boundaries with all sorts of line
     endings, even in files that don't end with a newline."""
-    eq_(list((point, is_start) for point, is_start, _ in
-             line_boundaries('abc\ndef\r\nghi\rjkl')),
-        [(4, False),
-         (9, False),
-         (13, False),
-         (16, False)])
+    eq_(
+        [
+            (point, is_start)
+            for point, is_start, _ in line_boundaries('abc\ndef\r\nghi\rjkl')
+        ],
+        [(4, False), (9, False), (13, False), (16, False)],
+    )
 
 
 class RemoveOverlappingTests(TestCase):
@@ -63,11 +64,11 @@ class RemoveOverlappingTests(TestCase):
 def spaced_tags(tags):
     """Render (point, is_start, payload) triples as human-readable
     representations."""
-    segments = []
-    for point, is_start, payload in tags:
-        segments.append(' ' * point + ('<%s%s>' % ('' if is_start else '/',
-                                                   'L' if payload is LINE else
-                                                        payload.payload)))
+    segments = [
+        ' ' * point
+        + f"<{'' if is_start else '/'}{'L' if payload is LINE else payload.payload}>"
+        for point, is_start, payload in tags
+    ]
     return '\n'.join(segments)
 
 

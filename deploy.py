@@ -69,9 +69,11 @@ def main():
 
     options, args = parser.parse_args()
     if len(args) == 1:
-        non_none_options = dict((k, getattr(options, k)) for k in
-                                (o.dest for o in parser.option_list if o.dest)
-                                if getattr(options, k))
+        non_none_options = {
+            k: getattr(options, k)
+            for k in (o.dest for o in parser.option_list if o.dest)
+            if getattr(options, k)
+        }
         Deployment(args[0], **non_none_options).deploy_if_appropriate()
     else:
         parser.print_usage()
@@ -134,10 +136,9 @@ class Deployment(object):
         response = requests.get('https://ci.mozilla.org/job/dxr/'
                                 'lastSuccessfulBuild/git/api/json',
                                 verify=True)
-        return (response.json()['buildsByBranchName']
-                               ['origin/%s' % self.branch]
-                               ['revision']
-                               ['SHA1'])
+        return response.json()['buildsByBranchName'][f'origin/{self.branch}'][
+            'revision'
+        ]['SHA1']
 
     def build(self, rev):
         """Create and return the path of a new directory containing a new
@@ -151,8 +152,9 @@ class Deployment(object):
 
         """
         VENV_NAME = 'virtualenv'
-        new_build_path = mkdtemp(prefix='%s-' % rev[:6],
-                                 dir=join(self.base_path, 'builds'))
+        new_build_path = mkdtemp(
+            prefix=f'{rev[:6]}-', dir=join(self.base_path, 'builds')
+        )
         with cd(new_build_path):
             # Make a fresh, blank virtualenv:
             run('virtualenv -p {python} --no-site-packages {venv_name}',
@@ -217,7 +219,7 @@ class Deployment(object):
 
     def deploy_if_appropriate(self):
         """Deploy a new build if we should."""
-        with nonblocking_lock('dxr-deploy-%s' % self.kind) as got_lock:
+        with nonblocking_lock(f'dxr-deploy-{self.kind}') as got_lock:
             if got_lock:
                 try:
                     rev = self.manual_rev or self.rev_to_deploy()
@@ -225,14 +227,10 @@ class Deployment(object):
                     self.install(new_build_path)
                 except ShouldNotDeploy:
                     pass
-                else:
-                    # if not self.passes_smoke_test():
-                    #     self.rollback()
-                    pass
 
     def _deployment_path(self):
         """Return the path of the symlink to the deployed build of DXR."""
-        return join(self.base_path, 'dxr-%s' % self.kind)
+        return join(self.base_path, f'dxr-{self.kind}')
 
 
 def run(command, **kwargs):
@@ -253,10 +251,10 @@ def run(command, **kwargs):
     doesn't need to be read out of order, as with anonymous tokens.
 
     """
-    output = check_output(
-        command.format(**dict((k, quote(v)) for k, v in kwargs.iteritems())),
-        shell=True)
-    return output
+    return check_output(
+        command.format(**{k: quote(v) for k, v in kwargs.iteritems()}),
+        shell=True,
+    )
 
 
 @contextmanager

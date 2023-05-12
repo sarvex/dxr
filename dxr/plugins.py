@@ -20,7 +20,7 @@ def load_indexers(tree):
     for name in tree.enabled_plugins:
         path = os.path.join(tree.config.plugin_folder, name)
         f, mod_path, desc = imp.find_module("indexer", [path])
-        plugin = imp.load_module('dxr.plugins.' + name + "_indexer", f, mod_path, desc)
+        plugin = imp.load_module(f'dxr.plugins.{name}_indexer', f, mod_path, desc)
         f.close()
         plugins.append(plugin)
     return plugins
@@ -34,7 +34,7 @@ def load_htmlifiers(tree):
     for name in tree.enabled_plugins:
         path = os.path.join(tree.config.plugin_folder, name)
         f, mod_path, desc = imp.find_module("htmlifier", [path])
-        plugin = imp.load_module('dxr.plugins.' + name + "_htmlifier", f, mod_path, desc)
+        plugin = imp.load_module(f'dxr.plugins.{name}_htmlifier', f, mod_path, desc)
         f.close()
         plugins.append(plugin)
     return plugins

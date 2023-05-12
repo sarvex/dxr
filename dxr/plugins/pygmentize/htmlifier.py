@@ -10,13 +10,18 @@ import dxr.plugins
 
 
 token_classes = {Token.Comment.Preproc: 'p'}
-token_classes.update((t, 'k') for t in [Token.Keyword,
-                                        Token.Keyword.Constant,
-                                        Token.Keyword.Declaration,
-                                        Token.Keyword.Namespace,
-                                        Token.Keyword.Pseudo,
-                                        Token.Keyword.Reserved,
-                                        Token.Keyword.Type])
+token_classes |= (
+    (t, 'k')
+    for t in [
+        Token.Keyword,
+        Token.Keyword.Constant,
+        Token.Keyword.Declaration,
+        Token.Keyword.Namespace,
+        Token.Keyword.Pseudo,
+        Token.Keyword.Reserved,
+        Token.Keyword.Type,
+    ]
+)
 token_classes.update((t, 'str') for t in [Token.String,
                                           Token.String.Backtick,
                                           Token.String.Char,
@@ -35,7 +40,6 @@ token_classes.update((t, 'c') for t in [Token.Comment,
                                         Token.Comment.Special])
 
 
-# Extend the Pygments Javascript lexer to handle preprocessor directives.
 class JavascriptPreprocLexer(JavascriptLexer):
     """
     For Javascript with Mozilla build preprocessor directives.
@@ -70,8 +74,7 @@ class Pygmentizer(object):
 
     def regions(self):
         for index, token, text in self.lexer.get_tokens_unprocessed(self.text):
-            cls = token_classes.get(token)
-            if cls:
+            if cls := token_classes.get(token):
                 yield index, index + len(text), cls
 
     def annotations(self):

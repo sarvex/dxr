@@ -83,13 +83,10 @@ def non_negative_int(s, default):
 
 def search_url(www_root, tree, query, **query_string_params):
     """Return the URL to the search endpoint."""
-    ret = '%s/%s/search?q=%s' % (www_root,
-                                 quote(tree),
-                                 # quote_plus needs a string.
-                                 quote_plus(query.encode('utf-8')))
+    ret = f"{www_root}/{quote(tree)}/search?q={quote_plus(query.encode('utf-8'))}"
     for key, value in query_string_params.iteritems():
         if value is not None:
-            ret += '&%s=%s' % (key, ('true' if value else 'false'))
+            ret += f"&{key}={'true' if value else 'false'}"
     return ret
 
 

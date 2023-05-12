@@ -44,7 +44,7 @@ def linked_pathname(path, tree_name):
 
     """
     # Hold the root of the tree:
-    components = [('/%s/source' % tree_name, tree_name)]
+    components = [(f'/{tree_name}/source', tree_name)]
 
     # Populate each subtree:
     dirs = path.split(os.sep)  # TODO: Trips on \/ in path.
@@ -455,7 +455,7 @@ def _sliced_range_bounds(a, b, slice_size):
     """Divide ``range(a, b)`` into slices of size ``slice_size``, and
     return the min and max values of each slice."""
     this_min = a
-    while this_min == a or this_max < b:
+    while this_min == this_min or this_max < b:
         this_max = min(b, this_min + slice_size - 1)
         yield this_min, this_max
         this_min = this_max + 1
@@ -503,7 +503,7 @@ def _build_html_for_file_ids(tree, start, end):
         # more humane) so we can get some automatic timestamps. If we get
         # timestamps spit out in the parent process, we don't need any of the
         # timing or counting code here.
-        with open_log(tree, 'build-html-%s-%s.log' % (start, end)) as log:
+        with open_log(tree, f'build-html-{start}-{end}.log') as log:
             # Load htmlifier plugins:
             plugins = load_htmlifiers(tree)
             for plugin in plugins:
@@ -522,7 +522,7 @@ def _build_html_for_file_ids(tree, start, end):
                                  """,
                                  [start, end]),
                     1):
-                dst_path = os.path.join(tree.target_folder, path + '.html')
+                dst_path = os.path.join(tree.target_folder, f'{path}.html')
                 log.write('Starting %s.\n' % path)
                 htmlify(tree, conn, icon, path, text, dst_path, plugins)
 
@@ -542,8 +542,7 @@ def htmlify(tree, conn, icon, path, text, dst_path, plugins):
     # Create htmlifiers for this source
     htmlifiers = []
     for plugin in plugins:
-        htmlifier = plugin.htmlify(path, text)
-        if htmlifier:
+        if htmlifier := plugin.htmlify(path, text):
             htmlifiers.append(htmlifier)
     # Load template
     env = load_template_env(tree.config.temp_folder)
@@ -604,7 +603,7 @@ class TagWriter(object):
 
     # __repr__ comes in handy for debugging.
     def __repr__(self):
-        return '%s("%s")' % (self.__class__.__name__, self.payload)
+        return f'{self.__class__.__name__}("{self.payload}")'
 
 
 class Region(TagWriter):
@@ -613,7 +612,7 @@ class Region(TagWriter):
                     # them.
 
     def opener(self):
-        return u'<span class="%s">' % cgi.escape(self.payload, True)
+        return f'<span class="{cgi.escape(self.payload, True)}">'
 
     def closer(self):
         return u'</span>'
@@ -626,13 +625,9 @@ class Ref(TagWriter):
     def opener(self):
         menu, qualname, value = self.payload
         menu = cgi.escape(json.dumps(menu), True)
-        css_class = ''
-        if qualname:
-            css_class = ' class=\"tok' + str(hash(qualname)) +'\"'
-        title = ''
-        if value:
-            title = ' title="' + cgi.escape(value, True) + '"'
-        return u'<a data-menu="%s"%s%s>' % (menu, css_class, title)
+        css_class = ' class=\"tok' + str(hash(qualname)) +'\"' if qualname else ''
+        title = f' title="{cgi.escape(value, True)}"' if value else ''
+        return f'<a data-menu="{menu}"{css_class}{title}>'
 
     def closer(self):
         return u'</a>'
@@ -705,8 +700,7 @@ def without_empty_tags(tags):
 
             # If we have a balanced set of non-zero-width tags, emit them:
             if not depth:
-                for b in buffer:
-                    yield b
+                yield from buffer
                 del buffer[:]
 
 
@@ -754,9 +748,7 @@ def balanced_tags_with_empties(tags):
         elif payload is LINE:
             # Close all open tags before a line break (since each line is
             # wrapped in its own <code> tag pair), and reopen them afterward.
-            for t in close():  # I really miss "yield from".
-                yield t
-
+            yield from close()
             # Since preserving self-closing linebreaks would throw off
             # without_empty_tags(), we convert to explicit closers here. We
             # surround each line with them because empty balanced ones would
@@ -764,21 +756,17 @@ def balanced_tags_with_empties(tags):
             yield point, False, LINE
             yield point, True, LINE
 
-            for t in reopen():
-                yield t
+            yield from reopen()
         else:
             # Temporarily close whatever's been opened between the start tag of
             # the thing we're trying to close and here:
-            for t in close(to=payload):
-                yield t
-
+            yield from close(to=payload)
             # Close the current tag:
             yield point, False, payload
             opens.pop()
 
             # Reopen the temporarily closed ones:
-            for t in reopen():
-                yield t
+            yield from reopen()
     yield point, False, LINE
 
 

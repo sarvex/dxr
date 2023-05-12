@@ -7,8 +7,10 @@ import urllib
 """ Regular expression for matching urls
 Credits to: http://stackoverflow.com/a/1547940
 """
-pat  = "\[(https?://[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+\.[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+)\]"
-pat += "|\((https?://[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+\.[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+)\)"
+pat = (
+    "\[(https?://[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+\.[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+)\]"
+    + "|\((https?://[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+\.[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+)\)"
+)
 pat += "|(https?://[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+\.[A-Za-z0-9\-\._~:\/\?#[\]@!\$&'()*\+,;=%]+)"
 urlFinder = re.compile(pat)
 
@@ -35,12 +37,22 @@ class UrlHtmlifier(object):
             except UnicodeDecodeError:
                 pass
             else:
-                yield start, end, ([{
-                    'html':   "Follow link",
-                    'title':  "Visit %s" % url,
-                    'href':   url,
-                    'icon':   'external_link'
-                }], '', None)
+                yield (
+                    start,
+                    end,
+                    (
+                        [
+                            {
+                                'html': "Follow link",
+                                'title': f"Visit {url}",
+                                'href': url,
+                                'icon': 'external_link',
+                            }
+                        ],
+                        '',
+                        None,
+                    ),
+                )
     
     def regions(self):
         return []

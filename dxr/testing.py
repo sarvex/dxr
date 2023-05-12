@@ -63,9 +63,12 @@ class TestCase(unittest.TestCase):
 
     def found_files(self, query, is_case_sensitive=True):
         """Return the set of paths of files found by a search query."""
-        return set(result['path'] for result in
-                   self.search_results(query,
-                                       is_case_sensitive=is_case_sensitive))
+        return {
+            result['path']
+            for result in self.search_results(
+                query, is_case_sensitive=is_case_sensitive
+            )
+        }
 
     def found_files_eq(self, query, filenames, is_case_sensitive=True):
         """Assert that executing the search ``query`` finds the paths
@@ -123,8 +126,8 @@ class TestCase(unittest.TestCase):
 
         """
         response = self.client().get(
-            '/code/search?format=json&q=%s&redirect=false&case=%s' %
-            (quote(query), 'true' if is_case_sensitive else 'false'))
+            f"/code/search?format=json&q={quote(query)}&redirect=false&case={'true' if is_case_sensitive else 'false'}"
+        )
         return json.loads(response.data)['results']
 
     def clang_at_least(self, version):
@@ -132,9 +135,7 @@ class TestCase(unittest.TestCase):
         if not output:
             return False
         match = re.match("clang version ([0-9]+\.[0-9]+)", output)
-        if not match:
-            return False
-        return float(match.group(1)) >= version
+        return False if not match else float(match[1]) >= version
 
 
 class DxrInstanceTestCase(TestCase):

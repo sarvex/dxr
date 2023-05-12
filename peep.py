@@ -105,7 +105,7 @@ class DownloadError(Exception):
         self.reason = str(exc)
 
     def __str__(self):
-        return 'Downloading %s failed: %s' % (self.link, self.reason)
+        return f'Downloading {self.link} failed: {self.reason}'
 
 
 def encoded_hash(sha):
@@ -138,17 +138,17 @@ def hash_of_file(path):
     with open(path, 'rb') as archive:
         sha = sha256()
         while True:
-            data = archive.read(2 ** 20)
-            if not data:
+            if data := archive.read(2**20):
+                sha.update(data)
+            else:
                 break
-            sha.update(data)
     return encoded_hash(sha)
 
 
 def is_git_sha(text):
     """Return whether this is probably a git sha"""
     # Handle both the full sha as well as the 7-character abbreviation
-    if len(text) in (40, 7):
+    if len(text) in {40, 7}:
         try:
             int(text, 16)
             return True
@@ -183,9 +183,8 @@ def requirement_args(argv, want_paths=False, want_other=False):
             was_r = False
         elif arg in ['-r', '--requirement']:
             was_r = True
-        else:
-            if want_other:
-                yield arg
+        elif want_other:
+            yield arg
 
 
 HASH_COMMENT_RE = re.compile(
@@ -355,7 +354,7 @@ class DownloadedReq(object):
                     break
             # Handle github sha tarball downloads.
             if is_git_sha(filename):
-                filename = package_name + '-' + filename
+                filename = f'{package_name}-{filename}'
             if not filename.lower().replace('_', '-').startswith(package_name.lower()):
                 # TODO: Should we replace runs of [^a-zA-Z0-9.], not just _, with -?
                 give_up(filename, package_name)
@@ -372,8 +371,9 @@ class DownloadedReq(object):
             return version
 
         def give_up(filename, package_name):
-            raise RuntimeError("The archive '%s' didn't start with the package name '%s', so I couldn't figure out the version number. My bad; improve me." %
-                               (filename, package_name))
+            raise RuntimeError(
+                f"The archive '{filename}' didn't start with the package name '{package_name}', so I couldn't figure out the version number. My bad; improve me."
+            )
 
         get_version =  (version_of_wheel
                         if self._downloaded_filename().endswith('.whl')
@@ -387,11 +387,7 @@ class DownloadedReq(object):
         from the filename.
 
         """
-        # If this is a github sha tarball, then it is always unsatisfied
-        # because the url has a commit sha in it and not the version
-        # number.
-        url = self._req.url
-        if url:
+        if url := self._req.url:
             filename = filename_from_url(url)
             if filename.endswith(ARCHIVE_EXTENSIONS):
                 filename, ext = splitext(filename)
@@ -529,34 +525,27 @@ class DownloadedReq(object):
                 if self._req.url is None
                 else Link(self._req.url))
 
-        if link:
-            lower_scheme = link.scheme.lower()  # pip lower()s it for some reason.
-            if lower_scheme == 'http' or lower_scheme == 'https':
-                file_path = self._download(link)
-                return basename(file_path)
-            elif lower_scheme == 'file':
-                # The following is inspired by pip's unpack_file_url():
-                link_path = url_to_path(link.url_without_fragment)
-                if isdir(link_path):
-                    raise UnsupportedRequirementError(
-                        "%s: %s is a directory. So that it can compute "
-                        "a hash, peep supports only filesystem paths which "
-                        "point to files" %
-                        (self._req, link.url_without_fragment))
-                else:
-                    copy(link_path, self._temp_path)
-                    return basename(link_path)
-            else:
+        if not link:
+            raise UnsupportedRequirementError(
+                f"{self._req}: couldn't determine where to download this requirement from."
+            )
+        lower_scheme = link.scheme.lower()  # pip lower()s it for some reason.
+        if lower_scheme in ['http', 'https']:
+            file_path = self._download(link)
+            return basename(file_path)
+        elif lower_scheme == 'file':
+            # The following is inspired by pip's unpack_file_url():
+            link_path = url_to_path(link.url_without_fragment)
+            if isdir(link_path):
                 raise UnsupportedRequirementError(
-                    "%s: The download link, %s, would not result in a file "
-                    "that can be hashed. Peep supports only == requirements, "
-                    "file:// URLs pointing to files (not folders), and "
-                    "http:// and https:// URLs pointing to tarballs, zips, "
-                    "etc." % (self._req, link.url))
+                    f"{self._req}: {link.url_without_fragment} is a directory. So that it can compute a hash, peep supports only filesystem paths which point to files"
+                )
+            copy(link_path, self._temp_path)
+            return basename(link_path)
         else:
             raise UnsupportedRequirementError(
-                "%s: couldn't determine where to download this requirement from."
-                % (self._req,))
+                f"{self._req}: The download link, {link.url}, would not result in a file that can be hashed. Peep supports only == requirements, file:// URLs pointing to files (not folders), and http:// and https:// URLs pointing to tarballs, zips, etc."
+            )
 
     def install(self):
         """Install the package I represent, without dependencies.
@@ -579,8 +568,7 @@ class DownloadedReq(object):
         Raise ValueError if there is no name.
 
         """
-        name = getattr(self._req.req, 'project_name', '')
-        if name:
+        if name := getattr(self._req.req, 'project_name', ''):
             return name
         raise ValueError('Requirement has no project_name.')
 
@@ -627,7 +615,7 @@ class MalformedReq(DownloadedReq):
         return 'The following requirements could not be processed:\n'
 
     def error(self):
-        return '* Unable to determine package name from URL %s; add #egg=' % self._url()
+        return f'* Unable to determine package name from URL {self._url()}; add #egg='
 
 
 class MissingReq(DownloadedReq):
@@ -643,9 +631,9 @@ class MissingReq(DownloadedReq):
         if self._url():
             line = self._url()
             if self._name() not in filename_from_url(self._url()):
-                line = '%s#egg=%s' % (line, self._name())
+                line = f'{line}#egg={self._name()}'
         else:
-            line = '%s==%s' % (self._name(), self._version())
+            line = f'{self._name()}=={self._version()}'
         return '# sha256: %s\n%s\n' % (self._actual_hash(), line)
 
 
@@ -658,9 +646,7 @@ class MismatchedReq(DownloadedReq):
                 "freak out, because someone has tampered with the packages.\n\n")
 
     def error(self):
-        preamble = '    %s: expected%s' % (
-                self._project_name(),
-                ' one of' if len(self._expected_hashes()) > 1 else '')
+        preamble = f"    {self._project_name()}: expected{' one of' if len(self._expected_hashes()) > 1 else ''}"
         return '%s %s\n%s got %s' % (
             preamble,
             ('\n' + ' ' * (len(preamble) + 1)).join(self._expected_hashes()),
@@ -682,7 +668,7 @@ class SatisfiedReq(DownloadedReq):
                 "safe. If not, uninstall them, then re-attempt your install with peep.\n")
 
     def error(self):
-        return '   %s' % (self._req,)
+        return f'   {self._req}'
 
 
 class InstallableReq(DownloadedReq):

@@ -54,7 +54,6 @@ class MemberFunctionTests(DirectResultQueryTests):
 
         """
         raise SkipTest('This does not take precedence like it should.')
-        self.direct_result_eq('MemberFunction::member_function', 14)
 
     def test_qualified_function_name_prefix_multiple_matches(self):
         """Multiple prefix matches on fully qualified function name should
@@ -74,7 +73,6 @@ class MemberFunctionTests(DirectResultQueryTests):
 
         """
         raise SkipTest('This does not take precedence like it should.')
-        self.direct_result_eq('MemberFunction::InnerClass', 8)
 
     def test_qualified_type_name_multiple_matches(self):
         """Multiple case-insensitive prefix matches on fully qualified type

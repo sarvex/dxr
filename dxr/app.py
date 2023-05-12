@@ -41,7 +41,7 @@ def index():
     config = current_app.config
     wwwroot = config['WWW_ROOT']
     tree = config['DEFAULT_TREE']
-    return redirect('%s/%s/source/' % (wwwroot, tree))
+    return redirect(f'{wwwroot}/{tree}/source/')
 
 
 @dxr_blueprint.route('/<tree>/search')
@@ -87,8 +87,7 @@ def search(tree):
 
             # Try for a direct result:
             if querystring.get('redirect') == 'true':
-                result = q.direct_result()
-                if result:
+                if result := q.direct_result():
                     path, line = result
                     # TODO: Does this escape qtext properly?
                     return redirect(
@@ -113,7 +112,7 @@ def search(tree):
                     warning = e.message[6:]
                     results = []
                 else:
-                    error = 'Database error: %s' % e.message
+                    error = f'Database error: {e.message}'
             if not error:
                 # Search template variables:
                 arguments['time'] = time() - start
@@ -136,7 +135,7 @@ def search(tree):
                         for t, description in trees.iteritems()]
     else:
         arguments['tree'] = trees.keys()[0]
-        error = "Tree '%s' is not a valid tree." % tree
+        error = f"Tree '{tree}' is not a valid tree."
         status_code = 404
 
     if warning or error:
@@ -162,9 +161,8 @@ def search(tree):
 
     if error:
         return render_template('error.html', **arguments), status_code or 500
-    else:
-        arguments['filters'] = filter_menu_items(config['FILTER_LANGUAGE'])
-        return render_template('search.html', **arguments)
+    arguments['filters'] = filter_menu_items(config['FILTER_LANGUAGE'])
+    return render_template('search.html', **arguments)
 
 
 @dxr_blueprint.route('/<tree>/source/')
@@ -179,7 +177,7 @@ def browse(tree, path=''):
 @dxr_blueprint.route('/<tree>')
 def tree_root(tree):
     """Redirect requests for the tree root instead of giving 404s."""
-    return redirect(tree + '/source/')
+    return redirect(f'{tree}/source/')
 
 
 @dxr_blueprint.route('/<tree>/parallel/')
@@ -231,4 +229,4 @@ def _html_file_path(tree_folder, url_path):
         return join(url_path, current_app.config['DIRECTORY_INDEX'])
     else:
         # It's a file. Add the .html extension:
-        return url_path + '.html'
+        return f'{url_path}.html'

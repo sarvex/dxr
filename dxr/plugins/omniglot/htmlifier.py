@@ -105,8 +105,12 @@ class Mercurial(VCS):
         self.upstream = urlparse.urlunparse(recomb)
 
         # Find all untracked files
-        self.untracked_files = set(line.split()[1] for line in
-            self.invoke_vcs(['hg', 'status', '-u', '-i']).split('\n')[:-1])
+        self.untracked_files = {
+            line.split()[1]
+            for line in self.invoke_vcs(['hg', 'status', '-u', '-i']).split('\n')[
+                :-1
+            ]
+        }
 
     @staticmethod
     def claim_vcs_source(path, dirs):
@@ -119,23 +123,24 @@ class Mercurial(VCS):
         return self.revision
 
     def generate_log(self, path):
-        return self.upstream + 'filelog/' + self.revision + '/' + path
+        return f'{self.upstream}filelog/{self.revision}/{path}'
 
     def generate_blame(self, path):
-        return self.upstream + 'annotate/' + self.revision + '/' + path
+        return f'{self.upstream}annotate/{self.revision}/{path}'
 
     def generate_diff(self, path):
-        return self.upstream + 'diff/' + self.revision + '/' + path
+        return f'{self.upstream}diff/{self.revision}/{path}'
 
     def generate_raw(self, path):
-        return self.upstream + 'raw-file/' + self.revision + '/' + path
+        return f'{self.upstream}raw-file/{self.revision}/{path}'
 
 
 class Git(VCS):
     def __init__(self, root):
         super(Git, self).__init__(root)
-        self.untracked_files = set(line for line in
-            self.invoke_vcs(['git', 'ls-files', '-o']).split('\n')[:-1])
+        self.untracked_files = set(
+            self.invoke_vcs(['git', 'ls-files', '-o']).split('\n')[:-1]
+        )
         self.revision = self.invoke_vcs(['git', 'rev-parse', 'HEAD'])
         source_urls = self.invoke_vcs(['git', 'remote', '-v']).split('\n')
         for src_url in source_urls:
@@ -155,18 +160,18 @@ class Git(VCS):
         return self.revision[:10]
 
     def generate_log(self, path):
-        return self.upstream + "/commits/" + self.revision + "/" + path
+        return f"{self.upstream}/commits/{self.revision}/{path}"
 
     def generate_blame(self, path):
-        return self.upstream + "/blame/" + self.revision + "/" + path
+        return f"{self.upstream}/blame/{self.revision}/{path}"
 
     def generate_diff(self, path):
         # I really want to make this anchor on the file in question, but github
         # doesn't seem to do that nicely
-        return self.upstream + "/commit/" + self.revision
+        return f"{self.upstream}/commit/{self.revision}"
 
     def generate_raw(self, path):
-        return self.upstream + "/raw/" + self.revision + "/" + path
+        return f"{self.upstream}/raw/{self.revision}/{path}"
 
     def synth_web_url(self, repo):
         if repo.startswith("git@github.com:"):
@@ -184,7 +189,7 @@ class Perforce(VCS):
     def __init__(self, root):
         super(Perforce, self).__init__(root)
         have = self._p4run(['have'])
-        self.have = dict((x['path'][len(root) + 1:], x) for x in have)
+        self.have = {x['path'][len(root) + 1:]: x for x in have}
         try:
             self.upstream = tree.plugin_omniglot_p4web
         except AttributeError:
@@ -315,7 +320,8 @@ class LinksHtmlifier(object):
             yield 'blame', "Blame", self.vcs.generate_blame(self.path)
             yield 'diff',  "Diff", self.vcs.generate_diff(self.path)
             yield 'raw', "Raw", self.vcs.generate_raw(self.path)
-        yield 5, '%s (%s)' % (self.name, self.vcs.get_rev(self.path)), items()
+
+        yield (5, f'{self.name} ({self.vcs.get_rev(self.path)})', items())
 
 
 def htmlify(path, text):

@@ -22,11 +22,9 @@ def pre_process(tree, env):
         '-add-plugin', 'dxr-index',
         '-plugin-arg-dxr-index', tree.source_folder
     ]
-    flags_str = ""
-    for flag in flags:
-        flags_str += ' -Xclang ' + flag
-    env['CC']   = "clang %s"   % flags_str
-    env['CXX']  = "clang++ %s" % flags_str
+    flags_str = "".join(f' -Xclang {flag}' for flag in flags)
+    env['CC'] = f"clang {flags_str}"
+    env['CXX'] = f"clang++ {flags_str}"
     env['DXR_CC'] = env['CC']
     env['DXR_CXX'] = env['CXX']
     env['DXR_CLANG_FLAGS'] = flags_str
@@ -272,10 +270,12 @@ def getFileID(conn, path):
         return file_id
 
     cur = conn.cursor()
-    row = cur.execute("SELECT id FROM files where path=?", (path,)).fetchone()
-    file_id = None
-    if row:
+    if row := cur.execute(
+        "SELECT id FROM files where path=?", (path,)
+    ).fetchone():
         file_id = row[0]
+    else:
+        file_id = None
     file_cache[path] = file_id
     return file_id
 
@@ -287,14 +287,10 @@ def fixupEntryPath(args, file_key, conn, prefix=None):
     value = args[file_key]
     loc = splitLoc(conn, value)
 
-    if prefix is not None:
-        prefix = prefix + "_"
-    else:
-        prefix = ''
-
-    args[prefix + 'file_id'] = loc[0]
-    args[prefix + 'file_line'] = loc[1]
-    args[prefix + 'file_col'] = loc[2]
+    prefix = f"{prefix}_" if prefix is not None else ''
+    args[f'{prefix}file_id'] = loc[0]
+    args[f'{prefix}file_line'] = loc[1]
+    args[f'{prefix}file_col'] = loc[2]
     return loc[0] is not None
 
 def fixupExtent(args, extents_key='extent'):
@@ -317,32 +313,29 @@ def getScope(args, conn):
     row = conn.execute("SELECT id FROM scopes WHERE file_id=? AND file_line=? AND file_col=?",
                                           (args['file_id'], args['file_line'], args['file_col'])).fetchone()
 
-    if row is not None:
-        return row[0]
-
-    return None
+    return row[0] if row is not None else None
 
 def addScope(args, conn, name, id):
-    scope = {}
-    scope['name'] = args[name]
-    scope['id'] = args[id]
-    scope['file_id'] = args['file_id']
-    scope['file_line'] = args['file_line']
-    scope['file_col'] = args['file_col']
-    scope['language'] = 'native'
-
+    scope = {
+        'name': args[name],
+        'id': args[id],
+        'file_id': args['file_id'],
+        'file_line': args['file_line'],
+        'file_col': args['file_col'],
+        'language': 'native',
+    }
     stmt = language_schema.get_insert_sql('scopes', scope)
     conn.execute(stmt[0], stmt[1])
 
 def handleScope(args, conn, canonicalize=False):
-    scope = {}
-
     if 'scopename' not in args:
         return
 
-    scope['name'] = args['scopename']
-    scope['loc'] = args['scopeloc']
-    scope['language'] = 'native'
+    scope = {
+        'name': args['scopename'],
+        'loc': args['scopeloc'],
+        'language': 'native',
+    }
     if not fixupEntryPath(scope, 'loc', conn):
         return None
 
@@ -361,9 +354,7 @@ def handleScope(args, conn, canonicalize=False):
         args['scopeid'] = scopeid
 
 def _truncate(s, length=32):
-    if len(s) <= length:
-        return s
-    return s[:length - 3] + '...'
+    return s if len(s) <= length else f'{s[:length - 3]}...'
 
 def process_decldef(args, conn):
     if 'kind' not in args:
@@ -605,21 +596,17 @@ def _chunked_fetchall(cursor, chunk_size=100):
     Return a generator yielding lists of chunk_size rows.
 
     """
-    rows = cursor.fetchmany(chunk_size)
-    while rows:
-        for row in rows:
-            yield row
-        rows = cursor.fetchmany(chunk_size)
+    while rows := cursor.fetchmany(chunk_size):
+        yield from rows
 
 
 def generate_inheritance(conn):
     childMap, parentMap = {}, {}
-    types = {}
-
     cursor = conn.execute("SELECT qualname, file_id, file_line, file_col, id from types")
-    for row in _chunked_fetchall(cursor):
-        types[(row[0], row[1], row[2], row[3])] = row[4]
-
+    types = {
+        (row[0], row[1], row[2], row[3]): row[4]
+        for row in _chunked_fetchall(cursor)
+    }
     for infoKey in inheritance:
         info = inheritance[infoKey]
         try:
@@ -660,18 +647,18 @@ def generate_inheritance(conn):
 
 def generate_callgraph(conn):
     global calls
-    functions = {}
-    variables = {}
     callgraph = []
 
     cursor = conn.execute("SELECT qualname, file_id, file_line, file_col, id FROM functions")
-    for row in _chunked_fetchall(cursor):
-        functions[(row[0], row[1], row[2], row[3])] = row[4]
-    
+    functions = {
+        (row[0], row[1], row[2], row[3]): row[4]
+        for row in _chunked_fetchall(cursor)
+    }
     cursor = conn.execute("SELECT name, file_id, file_line, file_col, id FROM variables")
-    for row in _chunked_fetchall(cursor):
-        variables[(row[0], row[1], row[2], row[3])] = row[4]
-
+    variables = {
+        (row[0], row[1], row[2], row[3]): row[4]
+        for row in _chunked_fetchall(cursor)
+    }
     # Generate callers table
     for call in calls.values():
         if 'callername' in call:
@@ -721,8 +708,8 @@ def generate_callgraph(conn):
 
         overridemap.setdefault(basekey, set()).add(funcid)
 
-    rescan = [x for x in overridemap]
-    while len(rescan) > 0:
+    rescan = list(overridemap)
+    while rescan:
         base = rescan.pop(0)
         childs = overridemap[base]
         prev = len(childs)

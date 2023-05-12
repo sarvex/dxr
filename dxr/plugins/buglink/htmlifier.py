@@ -44,12 +44,22 @@ class BugLinkHtmlifier(object):
         global name
         for m in bug_finder.finditer(self.text):
             bug = m.group(1)
-            yield m.start(0), m.end(0), ([{
-                'html': cgi.escape("Lookup #%s" % bug),
-                'title': "Find this bug number at %s" % name,
-                'href': url % bug,
-                'icon': 'buglink'
-            }], '', None)
+            yield (
+                m.start(0),
+                m.end(0),
+                (
+                    [
+                        {
+                            'html': cgi.escape(f"Lookup #{bug}"),
+                            'title': f"Find this bug number at {name}",
+                            'href': url % bug,
+                            'icon': 'buglink',
+                        }
+                    ],
+                    '',
+                    None,
+                ),
+            )
 
     def regions(self):
         return []
