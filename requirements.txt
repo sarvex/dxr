@@ -25,4 +25,4 @@ Werkzeug==2.2.3
 
 # For deployment script only:
 # sha256: FWvz7Ce6nsfgz4--AoCHGAmdIY3kA-tkpxTXO6GimrE
-requests==2.20.0
+requests==2.31.0
