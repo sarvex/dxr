@@ -32,7 +32,7 @@ setup(
     install_requires=['click>=3.3,<5.0',
                       'configobj>=5.0.6',
                       'Flask>=0.9',
-                      'funcy>=1.0,<2.0',
+                      'funcy>=1.0,<3.0',
                       'futures>=2.1.1,<4.0',
                       'Jinja2>=2.6,<3.0',
                       'Mercurial>=3.4',
