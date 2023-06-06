@@ -35,8 +35,9 @@ more-itertools==9.1.0 \
     --hash=sha256:d2bc7f02446e86a68911e58ded76d6561eea00cddfb2a91e7019bbb586c799f3
 ordereddict==1.1 \
     --hash=sha256:1c35b4ac206cef2d24816c89f89cf289dd3d38cf7c449bb3fab7bf6d43f01b1f
-parsimonious==0.6.2 \
-    --hash=sha256:423ae2e16061504418ab7abf0a740e26a781f9bc7674a6cf5e2f11edb4ae8029
+parsimonious==0.10.0 \
+    --hash=sha256:8281600da180ec8ae35427a4ab4f7b82bfec1e3d1e52f80cb60ea82b9512501c \
+    --hash=sha256:982ab435fabe86519b57f6b35610aa4e4e977e9f02a14353edf4bbc75369fc0f
 pyelasticsearch==1.4.1 \
     --hash=sha256:492de90704726fdf61e323d6fc4061e50c78578ea2f5dfe65294791456e0701d
 Pygments==2.1.3 \

@@ -38,7 +38,7 @@ setup(
                       'Mercurial>=3.4',
                       'more-itertools>=2.0,<10.0',
                       'ordereddict>=1.1,<2.0',
-                      'parsimonious>=0.6,<0.7',
+                      'parsimonious>=0.6,<0.11',
                       'pyelasticsearch>=1.1,<2.0',
                       'Pygments>=2.1.3,<3.0',
                       'python-hglib>=1.7,<3.0',
