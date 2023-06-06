@@ -151,5 +151,5 @@ xpidl==1.0 \
 requests==2.31.0 \
     --hash=sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f \
     --hash=sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
-python-hglib==2.4 \
-    --hash=sha256:693d6ed92a6566e78802c7a03c256cda33d08c63ad3f00fcfa11379b184b9462
+python-hglib==2.6.2 \
+    --hash=sha256:b18bd1ed53c90ee57d5714d66ad6bb72b64e930d4aeca9830892c08bb28da608
