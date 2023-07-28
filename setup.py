@@ -36,7 +36,7 @@ setup(
                       'futures>=2.1.1,<4.0',
                       'Jinja2>=2.6,<4.0',
                       'Mercurial>=3.4',
-                      'more-itertools>=2.0,<10.0',
+                      'more-itertools>=2.0,<11.0',
                       'ordereddict>=1.1,<2.0',
                       'parsimonious>=0.6,<0.11',
                       'pyelasticsearch>=1.1,<2.0',
