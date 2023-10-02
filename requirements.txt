@@ -192,9 +192,9 @@ tabulate==0.9.0 \
 urllib3==2.0.5 \
     --hash=sha256:13abf37382ea2ce6fb744d4dad67838eec857c9f4f57009891805e0b5e123594 \
     --hash=sha256:ef16afa8ba34a1f989db38e1dbbe0c302e4289a47856990d0682e374563ce35e
-Werkzeug==2.3.7 \
-    --hash=sha256:2b8c0e447b4b9dbcc85dd97b6eeb4dcbaf6c8b6c3be0bd654e25553e0a2157d8 \
-    --hash=sha256:effc12dba7f3bd72e605ce49807bbe692bd729c3bb122a3b91747a6ae77df528
+Werkzeug==3.0.0 \
+    --hash=sha256:3ffff4dcc32db52ef3cc94dff3000a3c2846890f3a5a51800a27b909c5e770f0 \
+    --hash=sha256:cbb2600f7eabe51dbc0502f58be0b3e1b96b893b05695ea2b35b43d4de2d9962
 funcy==2.0 \
     --hash=sha256:3963315d59d41c6f30c04bc910e10ab50a3ac4a225868bfa96feed133df075cb \
     --hash=sha256:53df23c8bb1651b12f095df764bfb057935d49537a56de211b098f4c79614bb0
