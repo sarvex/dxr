@@ -92,9 +92,9 @@ parsimonious==0.10.0 \
     --hash=sha256:982ab435fabe86519b57f6b35610aa4e4e977e9f02a14353edf4bbc75369fc0f
 pyelasticsearch==1.4.1 \
     --hash=sha256:492de90704726fdf61e323d6fc4061e50c78578ea2f5dfe65294791456e0701d
-Pygments==2.17.1 \
-    --hash=sha256:1b37f1b1e1bff2af52ecaf28cc601e2ef7077000b227a0675da25aef85784bc4 \
-    --hash=sha256:e45a0e74bf9c530f564ca81b8952343be986a29f6afe7f5ad95c5f06b7bdf5e8
+Pygments==2.17.2 \
+    --hash=sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c \
+    --hash=sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367
 https://github.com/erikrose/schema/archive/99dc4130f0f05fd3c2d4bc6663a2419851f3c90f.zip#egg=schema \
     --hash=sha256:98414ccbb99090239729968fe4225a3173e3f0ec1bb5e5bd766abd76bc19a8d9
 simplejson==3.19.2 \
