@@ -9,7 +9,7 @@
 # sake of a good dev experience.
 
 # Ubuntu 14.04.3
-FROM ubuntu@sha256:0ca448cb174259ddb2ae6e213ebebe7590862d522fe38971e1175faedf0b6823
+FROM ubuntu@sha256:e6173d4dc55e76b87c4af8db8821b1feae4146dd47341e4d431118c7dd060a74
 
 MAINTAINER Erik Rose <erik@mozilla.com>
 
