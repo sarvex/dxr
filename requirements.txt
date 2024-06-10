@@ -92,9 +92,9 @@ MarkupSafe==2.1.5 \
     --hash=sha256:ffee1f21e5ef0d712f9033568f8344d5da8cc2869dbd08d87c84656e6a2d2f68
 Mercurial==6.7.3 \
     --hash=sha256:00196944ea92738809317dc7a8ed7cb21287ca0a00a85246e66170955dcd9031
-more-itertools==10.2.0 \
-    --hash=sha256:686b06abe565edfab151cb8fd385a05651e1fdf8f0a14191e4439283421f8684 \
-    --hash=sha256:8fccb480c43d3e99a00087634c06dd02b0d50fbf088b380de5a41a015ec239e1
+more-itertools==10.3.0 \
+    --hash=sha256:e5d93ef411224fbcef366a6e8ddc4c5781bc6359d43412a65dd5964e46111463 \
+    --hash=sha256:ea6a02e24a9161e51faad17a8782b92a0df82c12c1c8886fec7f0c3fa1a1b320
 ordereddict==1.1 \
     --hash=sha256:1c35b4ac206cef2d24816c89f89cf289dd3d38cf7c449bb3fab7bf6d43f01b1f
 parsimonious==0.10.0 \
